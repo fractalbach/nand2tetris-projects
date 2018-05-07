@@ -1,0 +1,85 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/05/Memory.hdl
+
+/**
+ * The complete address space of the Hack computer's memory,
+ * including RAM and memory-mapped I/O. 
+ * The chip facilitates read and write operations, as follows:
+ *     Read:  out(t) = Memory[address(t)](t)
+ *     Write: if load(t-1) then Memory[address(t-1)](t) = in(t-1)
+ * In words: the chip always outputs the value stored at the memory 
+ * location specified by address. If load==1, the in value is loaded 
+ * into the memory location specified by address. This value becomes 
+ * available through the out output from the next time step onward.
+ * Address space rules:
+ * Only the upper 16K+8K+1 words of the Memory chip are used. 
+ * Access to address>0x6000 is invalid. Access to any address in 
+ * the range 0x4000-0x5FFF results in accessing the screen memory 
+ * map. Access to address 0x6000 results in accessing the keyboard 
+ * memory map. The behavior in these addresses is described in the 
+ * Screen and Keyboard chip specifications given in the book.
+ */
+
+CHIP Memory {
+    IN in[16], load, address[15];
+    OUT out[16];
+
+    PARTS:
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    // Define where the load bit should go; uses a 4-way de-multiplexer.
+    // 00, a, RAM 
+    // 01, b, RAM
+    // 10, c, Screen
+    // 11, d, Null (Keyboard doesn't require a load bit anyway)
+    // 
+    DMux4Way(in=load, sel=address[13..14], a=loadRAM1, b=loadRAM2, c=loadScreen);
+
+    // Since RAM covers both the 00 and 01 address spaces...
+    // We can do this using an OR gate to pass the activated load bit.
+    // If (addr[0..1] equals 00 or 01) Then send a load bit to the RAM.
+    // 
+    Or(a=loadRAM1, b=loadRAM2, out=loadRAM);
+
+
+    //|===============================================|
+    //|  Gimmee Tha Bits                              |
+    //|--------------------|---------|----------------|
+    //|_edc ba98 7654 3210 |  Thing  |  <- decimal    |
+    //|--------------------|---------|----------------| 
+    // _000 0000 0000 0000              <- 0
+    // _011 1111 1111 1111 = RAM16K     <- 16383
+    //   ^               ^
+    //  13               0
+    RAM16K(in=in, load=loadRAM, address=address[0..13], out=MemOut);
+
+    
+    
+    //|--------------------|---------|----------------| 
+    // _100 0000 0000 0000              <- 16384
+    // _101 1111 1111 1111 = screen     <- 24575
+    //    ^              ^
+    //   12              0
+    Screen(in=in, load=loadScreen, address=address[0..12], out=ScreenOut);
+
+    //|--------------------|---------|----------------| 
+    // _110 0000 0000 0000 = Keyboard   <- 24576
+    //    ^    ^ ^       ^
+    //   12    8 7       0 <- bit#
+    Keyboard(out=UnfilteredKeyOut);
+
+    // Filter Invalid Address Spaces from KeyOutput
+    // KeyOutput returns all 0s
+
+    Or8Way(in[3..7]=address[8..12], out=A);
+    Or8Way(in=address[0..7], out=B);
+    Or(a=A, b=B, out=invalid);
+    Mux16(a=UnfilteredKeyOut, b=false, sel=invalid, out=KeyOut);
+
+    //|===============================================|
+
+    // Final De-Multiplexer in order to determine which output to use.
+    Mux4Way16(a=MemOut, b=MemOut, c=ScreenOut, d=KeyOut, sel=address[13..14], out=out);
+}

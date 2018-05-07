@@ -1,0 +1,68 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/03/a/PC.hdl
+
+/**
+ * A 16-bit counter with load and reset control bits.
+ * if      (reset[t] == 1) out[t+1] = 0
+ * else if (load[t] == 1)  out[t+1] = in[t]
+ * else if (inc[t] == 1)   out[t+1] = out[t] + 1  (integer addition)
+ * else                    out[t+1] = out[t]
+ */
+
+CHIP PC {
+    IN in[16],load,inc,reset;
+    OUT out[16];
+
+    PARTS:
+
+    // #1:   
+    // INCREMENT.
+    // LOGIC STARTS HERE.
+    // Logic starts here, in + 1 is created, and passed along if inc=1,
+    // otherwise, the default "in" is passed to the next logical step.
+
+    Add16(a=LoopedOut, b[0]=true, b[1..15]=false, out=x0);
+    Mux16(a=in, b=x0, sel=inc, out=x1);
+
+
+    // #2: 
+    // LOAD.
+    // accepting the incremented value, we discard it if load=1, because
+    // this load=1 takes priority over the inc=1.  If load=1, then we want 
+    // to pass along the original input value.
+    Mux16(a=x1, b=in, sel=load, out=x2);
+
+
+    // #3:
+    // RESET.
+    // The reset=1 takes the highest priority, so it will overwrite #1 and #2,
+    // regardless of whether inc=1 or load=1.
+    // If reset=1, then it doesn't matter what load is, it will effectively set
+    // load to 1.
+
+    Mux16(a=x2, b=false, sel=reset, out=FinalInput);
+
+    // #4
+    // EFFECTIVE LOAD.
+    // The input variable "load" only refers the a customized input from user.
+    // The "load" value that is passed to the register in this chip requires a 
+    // different value.  This "EffectiveLoad" value is determined based on
+    // whether or not the value should change, which in turn is determined by
+    // the whether or not the "inc" or "reset" flags have been set.
+    Mux(a=load, b=true, sel=inc, out=load1);
+    Mux(a=load1, b=true, sel=reset, out=EffectiveLoad);
+
+
+    // #5:
+    // THE ACTUAL REGISTER.
+    // Now the final thing we do is pass our converted input to the register.
+    // The variable "FinalInput" has been determined by #1, #2, and #3.
+    // the variable "EffectiveLoad" was determined in #3.
+    // Once these settings have been considered in our logical steps,
+    // we are ready to do stuff with the Register.
+
+    Register(in=FinalInput, load=EffectiveLoad, out=LoopedOut, out=out);
+
+}
