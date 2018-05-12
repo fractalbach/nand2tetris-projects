@@ -1,6 +1,6 @@
 # Nand 2 Tetris Project Files
 
-This repository contains the projects from the course **Nand 2 Tetris**.  There are videos online from the [Nand2Tetris Coursera](https://www.coursera.org/learn/build-a-computer), and more information at the [Nand2Tetris Website](www.nand2tetris.org).
+This repository contains the projects from the course **Nand 2 Tetris**, and some of my work on those projects.  There are videos online from the [Nand2Tetris Coursera](https://www.coursera.org/learn/build-a-computer), and more information at the [Nand2Tetris Website](www.nand2tetris.org).
 
 
 
@@ -15,8 +15,7 @@ This repository contains the projects from the course **Nand 2 Tetris**.  There 
 	- Stack Arithmetic and Stack Machines
 	- Memory Access commands
 
-8. Virtual Machines Part II.
-	- Functions
+8. **(IN PROGRESS)**
 9.
 10.
 11.
