@@ -10,8 +10,13 @@ This repository contains the projects from the course **Nand 2 Tetris**.  There 
 4. Using Assembly Language to interact with RAM and the ALU.
 5. Making the CPU to interpret Assembly Language,  using RAM and the ALU
 6. Writing an Assembler to convert symbolic code into 1s and 0s. 
-7. VMs and Stack Arithmetic.
-8. 
+
+7. Virtual Machines Part I.
+	- Stack Arithmetic and Stack Machines
+	- Memory Access commands
+
+8. Virtual Machines Part II.
+	- Functions
 9.
 10.
 11.
