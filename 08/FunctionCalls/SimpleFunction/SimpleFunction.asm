@@ -1,3 +1,52 @@
+// bootstrap code
+// ----------------------------------
+// set stack pointer to 256
+@256
+D=A
+@SP
+M=D
+ // call sys.init 0 
+@RETURN.sys.init.1 	// push return address.
+D=A
+@SP // push d
+M=M+1
+A=M-1
+M=D
+@LCL		// push local
+D=M
+@SP // push d
+M=M+1
+A=M-1
+M=D
+@ARG		// push arg
+D=M
+@SP // push d
+M=M+1
+A=M-1
+M=D
+@THIS		// push this
+D=M
+@SP // push d
+M=M+1
+A=M-1
+M=D
+@5	 		// set D = (SP - (nArgs + 5))
+D=A
+@SP 	
+D=M-D
+@ARG 		// set ARG = D
+M=D
+@SP 		// set LCL = SP
+D=M
+@LCL
+M=D
+@FUNCTION.sys.init 	// goto f
+0; JMP
+(RETURN.sys.init.1)
+
+// ----------------------------------
+
+// ~~~~ SimpleFunction.vm ~~~~
 (FUNCTION.simplefunction.test)
 @SP
 M=M+1
@@ -82,21 +131,27 @@ A=A-1
 M=M-D
 
 // return
+@LCL 	// set FRAME = LCL
+D=M
+@FRAME  
+M=D	
+// @5		// set RET = *(FRAME - 5)
+// D=D-A 	// set D = (FRAME - 5)
+// A=D 	// Follow pointer *(FRAME-5)
+// D=M 	// set D = *(FRAME-5)
+// @RET 	// set RET = *(FRAME - 5)	
+// M=D
 @SP // pop d
 AM=M-1
 D=M
 M=0
 @ARG 	// places return value in the right spot.
-A=M
-M=D
-@ARG	// restores stack pointer.  SP <- ARG + 1
+A=M		// goto *(ARG)
+M=D 	// set *ARG = pop()
+@ARG	// restores stack pointer.  SP = ARG + 1
 D=M
 @SP
 M=D+1
-@LCL 	// init frame pointer
-D=M
-@FRAME
-M=D
 @FRAME
 AM=M-1
 D=M
@@ -104,7 +159,7 @@ D=M
 M=D
 @FRAME
 AM=M-1
-D=M
+D=M	
 @THIS	// restore this.
 M=D
 @FRAME
@@ -120,11 +175,6 @@ M=D
 @FRAME
 AM=M-1
 D=M
-A=D 	// jumps to return address.
-0;JMP
-
- // End of Program.
-(END)
-@END
+A=D
 0; JMP
 

@@ -27,7 +27,7 @@ M=D
 AM=M-1
 D=M
 M=0
-@StaticTest.vm.8
+@stdin.8
 M=D
 
 // pop static 3
@@ -35,7 +35,7 @@ M=D
 AM=M-1
 D=M
 M=0
-@StaticTest.vm.3
+@stdin.3
 M=D
 
 // pop static 1
@@ -43,11 +43,11 @@ M=D
 AM=M-1
 D=M
 M=0
-@StaticTest.vm.1
+@stdin.1
 M=D
 
 // push static 3
-@StaticTest.vm.3
+@stdin.3
 D=M
 @SP // push d
 M=M+1
@@ -55,7 +55,7 @@ A=M-1
 M=D
 
 // push static 1
-@StaticTest.vm.1
+@stdin.1
 D=M
 @SP // push d
 M=M+1
@@ -71,7 +71,7 @@ A=A-1
 M=M-D
 
 // push static 8
-@StaticTest.vm.8
+@stdin.8
 D=M
 @SP // push d
 M=M+1
@@ -85,9 +85,4 @@ D=M
 M=0
 A=A-1
 M=M+D
-
- // End of Program.
-(END)
-@END
-0; JMP
 

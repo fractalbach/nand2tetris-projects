@@ -265,8 +265,3 @@ M=0
 A=A-1
 M=M+D
 
- // End of Program.
-(END)
-@END
-0; JMP
-
