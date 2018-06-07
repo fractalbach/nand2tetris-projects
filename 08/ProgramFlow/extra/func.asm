@@ -16,7 +16,7 @@ M=D
 @400 	// THIS pointer.
 D=A
 @THIS
-M=A
+M=D
 
 @500 	// THAT pointer.
 D=A
