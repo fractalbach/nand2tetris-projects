@@ -13,7 +13,6 @@ M=D
 @SP // pop d
 AM=M-1
 D=M
-M=0
 @THAT
 M=D
 
@@ -35,7 +34,6 @@ M=D
 @SP // pop d
 AM=M-1
 D=M
-M=0
 @R13
 A=M
 M=D
@@ -58,7 +56,6 @@ M=D
 @SP // pop d
 AM=M-1
 D=M
-M=0
 @R13
 A=M
 M=D
@@ -86,7 +83,6 @@ M=D
 @SP // pop d
 AM=M-1
 D=M
-M=0
 A=A-1
 M=M-D
 
@@ -100,12 +96,11 @@ M=D
 @SP // pop d
 AM=M-1
 D=M
-M=0
 @R13
 A=M
 M=D
 
-(LABEL.main_loop_start)
+(LABEL.NullFunction$main_loop_start)
 // push ARG 0
 @0
 D=A
@@ -117,19 +112,18 @@ M=M+1
 A=M-1
 M=D
 
-// if-goto compute_element
+// if-goto NullFunction$compute_element
 @SP // pop d
 AM=M-1
 D=M
-M=0
-@LABEL.compute_element
+@LABEL.NullFunction$compute_element
 D; JNE
 
-// goto end_program
-@LABEL.end_program
+// goto NullFunction$end_program
+@LABEL.NullFunction$end_program
 0; JMP
 
-(LABEL.compute_element)
+(LABEL.NullFunction$compute_element)
 // push THAT 0
 @0
 D=A
@@ -156,7 +150,6 @@ M=D
 @SP // pop d
 AM=M-1
 D=M
-M=0
 A=A-1
 M=M+D
 
@@ -170,7 +163,6 @@ M=D
 @SP // pop d
 AM=M-1
 D=M
-M=0
 @R13
 A=M
 M=D
@@ -195,7 +187,6 @@ M=D
 @SP // pop d
 AM=M-1
 D=M
-M=0
 A=A-1
 M=M+D
 
@@ -203,7 +194,6 @@ M=M+D
 @SP // pop d
 AM=M-1
 D=M
-M=0
 @THAT
 M=D
 
@@ -230,7 +220,6 @@ M=D
 @SP // pop d
 AM=M-1
 D=M
-M=0
 A=A-1
 M=M-D
 
@@ -244,18 +233,12 @@ M=D
 @SP // pop d
 AM=M-1
 D=M
-M=0
 @R13
 A=M
 M=D
 
-// goto main_loop_start
-@LABEL.main_loop_start
+// goto NullFunction$main_loop_start
+@LABEL.NullFunction$main_loop_start
 0; JMP
 
-(LABEL.end_program)
- // End of Program.
-(END)
-@END
-0; JMP
-
+(LABEL.NullFunction$end_program)
