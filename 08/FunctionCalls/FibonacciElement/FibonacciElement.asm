@@ -5,42 +5,48 @@
 D=A
 @SP
 M=D
- // call sys.init 0 
-@RETURN.sys.init.1 	// push return address.
+// ===============  call sys.init 0 ====================
+@RETURN.sys.init.1  // push return address.
 D=A
 @SP // push d
 M=M+1
 A=M-1
 M=D
-@LCL		// push local
+@LCL   // push local
 D=M
 @SP // push d
 M=M+1
 A=M-1
 M=D
-@ARG		// push arg
+@ARG   // push arg
 D=M
 @SP // push d
 M=M+1
 A=M-1
 M=D
-@THIS		// push this
+@THIS  // push this
 D=M
 @SP // push d
 M=M+1
 A=M-1
 M=D
-@5	 		// set D = (SP - (nArgs + 5))
+@THAT  // push that
+D=M
+@SP // push d
+M=M+1
+A=M-1
+M=D
+@5    // set D <- (SP - nArgs - 5)
 D=A
-@SP 	
+@SP
 D=M-D
-@ARG 		// set ARG = D
+@ARG   // set ARG <- D
 M=D
-@SP 		// set LCL = SP
+@SP    // set LCL <- SP
 D=M
 @LCL
 M=D
-@FUNCTION.sys.init 	// goto f
+@FUNCTION.sys.init  // goto f
 0; JMP
 (RETURN.sys.init.1)
 
@@ -71,8 +77,7 @@ M=D
 // true if x < y, else false
 @SP // pop d
 AM=M-1
-D=M
-M=0 
+D=M 
 A=A-1
 D=M-D
 M=-1
@@ -87,7 +92,6 @@ M=0
 @SP // pop d
 AM=M-1
 D=M
-M=0
 @LABEL.main.fibonacci$if_true
 D; JNE
 
@@ -107,53 +111,54 @@ M=M+1
 A=M-1
 M=D
 
-// return
-@LCL 	// set FRAME = LCL
+// ==================== Return ============================
+        // ~~~~~~~  create frame pointer ~~~~~~~~~    FRAME = LCL
+@LCL    
 D=M
-@FRAME  
-M=D	
-// @5		// set RET = *(FRAME - 5)
-// D=D-A 	// set D = (FRAME - 5)
-// A=D 	// Follow pointer *(FRAME-5)
-// D=M 	// set D = *(FRAME-5)
-// @RET 	// set RET = *(FRAME - 5)	
-// M=D
+@R13    // <- using register 13 for frame pointer.
+M=D 
+        // ~~~~~~~  save return address ~~~~~~~~~~~~  RET = *(FRAME - 5)
+@5 
+A=D-A
+D=M 
+@R14    // <- using register 14 for return address.
+M=D
+        // ~~~~~~~ reposition return value ~~~~~~~~~  *ARG = pop()
 @SP // pop d
 AM=M-1
 D=M
-M=0
-@ARG 	// places return value in the right spot.
-A=M		// goto *(ARG)
-M=D 	// set *ARG = pop()
-@ARG	// restores stack pointer.  SP = ARG + 1
-D=A 	
-@SP
+@ARG
+A=M
+M=D
+        // ~~~~~~~~~~~~ restore values ~~~~~~~~~~~~~
+@ARG    // restores stack pointer.
+D=M
+@SP     // SP = ARG + 1
 M=D+1
-@FRAME
+@R13
 AM=M-1
 D=M
-@THAT 	// restore that.
+@THAT   // restore that
 M=D
-@FRAME
+@R13
 AM=M-1
-D=M
-@THIS	// restore this.
+D=M 
+@THIS   // restore this.
 M=D
-@FRAME
+@R13
 AM=M-1
 D=M
-@ARG	// restore arg.
+@ARG    // restore arg.
 M=D
-@FRAME
+@R13
 AM=M-1
 D=M
-@LCL 	// restore local.
+@LCL    // restore local.
 M=D
-@FRAME
-AM=M-1
-D=M
-A=D
-0; JMP
+        // ~~~~~~~ retrieve and jump to the return address ~~~~~~~~~~~~~
+@R14
+A=M
+0; JMP  // jump to the return address.
 
 (LABEL.main.fibonacci$if_false)
 // push ARG 0
@@ -179,46 +184,51 @@ M=D
 @SP // pop d
 AM=M-1
 D=M
-M=0
 A=A-1
 M=M-D
 
- // call main.fibonacci 1 
-@RETURN.main.fibonacci.2 	// push return address.
+// ===============  call main.fibonacci 1 ====================
+@RETURN.main.fibonacci.2  // push return address.
 D=A
 @SP // push d
 M=M+1
 A=M-1
 M=D
-@LCL		// push local
+@LCL   // push local
 D=M
 @SP // push d
 M=M+1
 A=M-1
 M=D
-@ARG		// push arg
+@ARG   // push arg
 D=M
 @SP // push d
 M=M+1
 A=M-1
 M=D
-@THIS		// push this
+@THIS  // push this
 D=M
 @SP // push d
 M=M+1
 A=M-1
 M=D
-@6	 		// set D = (SP - (nArgs + 5))
+@THAT  // push that
+D=M
+@SP // push d
+M=M+1
+A=M-1
+M=D
+@6    // set D <- (SP - nArgs - 5)
 D=A
-@SP 	
+@SP
 D=M-D
-@ARG 		// set ARG = D
+@ARG   // set ARG <- D
 M=D
-@SP 		// set LCL = SP
+@SP    // set LCL <- SP
 D=M
 @LCL
 M=D
-@FUNCTION.main.fibonacci 	// goto f
+@FUNCTION.main.fibonacci  // goto f
 0; JMP
 (RETURN.main.fibonacci.2)
 
@@ -245,46 +255,51 @@ M=D
 @SP // pop d
 AM=M-1
 D=M
-M=0
 A=A-1
 M=M-D
 
- // call main.fibonacci 1 
-@RETURN.main.fibonacci.3 	// push return address.
+// ===============  call main.fibonacci 1 ====================
+@RETURN.main.fibonacci.3  // push return address.
 D=A
 @SP // push d
 M=M+1
 A=M-1
 M=D
-@LCL		// push local
+@LCL   // push local
 D=M
 @SP // push d
 M=M+1
 A=M-1
 M=D
-@ARG		// push arg
+@ARG   // push arg
 D=M
 @SP // push d
 M=M+1
 A=M-1
 M=D
-@THIS		// push this
+@THIS  // push this
 D=M
 @SP // push d
 M=M+1
 A=M-1
 M=D
-@6	 		// set D = (SP - (nArgs + 5))
+@THAT  // push that
+D=M
+@SP // push d
+M=M+1
+A=M-1
+M=D
+@6    // set D <- (SP - nArgs - 5)
 D=A
-@SP 	
+@SP
 D=M-D
-@ARG 		// set ARG = D
+@ARG   // set ARG <- D
 M=D
-@SP 		// set LCL = SP
+@SP    // set LCL <- SP
 D=M
 @LCL
 M=D
-@FUNCTION.main.fibonacci 	// goto f
+@FUNCTION.main.fibonacci  // goto f
 0; JMP
 (RETURN.main.fibonacci.3)
 
@@ -292,57 +307,57 @@ M=D
 @SP // pop d
 AM=M-1
 D=M
-M=0
 A=A-1
 M=M+D
 
-// return
-@LCL 	// set FRAME = LCL
+// ==================== Return ============================
+        // ~~~~~~~  create frame pointer ~~~~~~~~~    FRAME = LCL
+@LCL    
 D=M
-@FRAME  
-M=D	
-// @5		// set RET = *(FRAME - 5)
-// D=D-A 	// set D = (FRAME - 5)
-// A=D 	// Follow pointer *(FRAME-5)
-// D=M 	// set D = *(FRAME-5)
-// @RET 	// set RET = *(FRAME - 5)	
-// M=D
+@R13    // <- using register 13 for frame pointer.
+M=D 
+        // ~~~~~~~  save return address ~~~~~~~~~~~~  RET = *(FRAME - 5)
+@5 
+A=D-A
+D=M 
+@R14    // <- using register 14 for return address.
+M=D
+        // ~~~~~~~ reposition return value ~~~~~~~~~  *ARG = pop()
 @SP // pop d
 AM=M-1
 D=M
-M=0
-@ARG 	// places return value in the right spot.
-A=M		// goto *(ARG)
-M=D 	// set *ARG = pop()
-@ARG	// restores stack pointer.  SP = ARG + 1
-D=A 	
-@SP
+@ARG
+A=M
+M=D
+        // ~~~~~~~~~~~~ restore values ~~~~~~~~~~~~~
+@ARG    // restores stack pointer.
+D=M
+@SP     // SP = ARG + 1
 M=D+1
-@FRAME
+@R13
 AM=M-1
 D=M
-@THAT 	// restore that.
+@THAT   // restore that
 M=D
-@FRAME
+@R13
 AM=M-1
-D=M
-@THIS	// restore this.
+D=M 
+@THIS   // restore this.
 M=D
-@FRAME
+@R13
 AM=M-1
 D=M
-@ARG	// restore arg.
+@ARG    // restore arg.
 M=D
-@FRAME
+@R13
 AM=M-1
 D=M
-@LCL 	// restore local.
+@LCL    // restore local.
 M=D
-@FRAME
-AM=M-1
-D=M
-A=D
-0; JMP
+        // ~~~~~~~ retrieve and jump to the return address ~~~~~~~~~~~~~
+@R14
+A=M
+0; JMP  // jump to the return address.
 
 // ~~~~ Sys.vm ~~~~
 (FUNCTION.sys.init)
@@ -355,42 +370,48 @@ M=M+1
 A=M-1
 M=D
 
- // call main.fibonacci 1 
-@RETURN.main.fibonacci.4 	// push return address.
+// ===============  call main.fibonacci 1 ====================
+@RETURN.main.fibonacci.4  // push return address.
 D=A
 @SP // push d
 M=M+1
 A=M-1
 M=D
-@LCL		// push local
+@LCL   // push local
 D=M
 @SP // push d
 M=M+1
 A=M-1
 M=D
-@ARG		// push arg
+@ARG   // push arg
 D=M
 @SP // push d
 M=M+1
 A=M-1
 M=D
-@THIS		// push this
+@THIS  // push this
 D=M
 @SP // push d
 M=M+1
 A=M-1
 M=D
-@6	 		// set D = (SP - (nArgs + 5))
+@THAT  // push that
+D=M
+@SP // push d
+M=M+1
+A=M-1
+M=D
+@6    // set D <- (SP - nArgs - 5)
 D=A
-@SP 	
+@SP
 D=M-D
-@ARG 		// set ARG = D
+@ARG   // set ARG <- D
 M=D
-@SP 		// set LCL = SP
+@SP    // set LCL <- SP
 D=M
 @LCL
 M=D
-@FUNCTION.main.fibonacci 	// goto f
+@FUNCTION.main.fibonacci  // goto f
 0; JMP
 (RETURN.main.fibonacci.4)
 
