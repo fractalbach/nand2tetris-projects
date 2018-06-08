@@ -5,42 +5,48 @@
 D=A
 @SP
 M=D
- // call sys.init 0 
-@RETURN.sys.init.1
+// ===============  call sys.init 0 ====================
+@RETURN.sys.init.1  // push return address.
 D=A
 @SP // push d
 M=M+1
 A=M-1
 M=D
-@LCL
+@LCL   // push local
 D=M
 @SP // push d
 M=M+1
 A=M-1
 M=D
-@ARG
+@ARG   // push arg
 D=M
 @SP // push d
 M=M+1
 A=M-1
 M=D
-@THIS
+@THIS  // push this
 D=M
 @SP // push d
 M=M+1
 A=M-1
 M=D
-@0
+@THAT  // push that
+D=M
+@SP // push d
+M=M+1
+A=M-1
+M=D
+@5    // set D <- (SP - nArgs - 5)
 D=A
 @SP
-D=D-A
-@ARG
+D=M-D
+@ARG   // set ARG <- D
 M=D
-@SP
+@SP    // set LCL <- SP
 D=M
 @LCL
 M=D
-@FUNCTION.sys.init
+@FUNCTION.sys.init  // goto f
 0; JMP
 (RETURN.sys.init.1)
 
@@ -64,7 +70,6 @@ M=D
 @SP // pop d
 AM=M-1
 D=M
-M=0
 @Class1.vm.0
 M=D
 
@@ -83,7 +88,6 @@ M=D
 @SP // pop d
 AM=M-1
 D=M
-M=0
 @Class1.vm.1
 M=D
 
@@ -95,47 +99,54 @@ M=M+1
 A=M-1
 M=D
 
-// return
+// ==================== Return ============================
+        // ~~~~~~~  create frame pointer ~~~~~~~~~    FRAME = LCL
+@LCL    
+D=M
+@R13    // <- using register 13 for frame pointer.
+M=D 
+        // ~~~~~~~  save return address ~~~~~~~~~~~~  RET = *(FRAME - 5)
+@5 
+A=D-A
+D=M 
+@R14    // <- using register 14 for return address.
+M=D
+        // ~~~~~~~ reposition return value ~~~~~~~~~  *ARG = pop()
 @SP // pop d
 AM=M-1
 D=M
-M=0
-@ARG 	// places return value in the right spot.
+@ARG
 A=M
 M=D
-@ARG	// restores stack pointer.  SP <- ARG + 1
+        // ~~~~~~~~~~~~ restore values ~~~~~~~~~~~~~
+@ARG    // restores stack pointer.
 D=M
-@SP
+@SP     // SP = ARG + 1
 M=D+1
-@LCL 	// init frame pointer
-D=M
-@FRAME
-M=D
-@FRAME
+@R13
 AM=M-1
 D=M
-@THAT 	// restore that.
+@THAT   // restore that
 M=D
-@FRAME
+@R13
+AM=M-1
+D=M 
+@THIS   // restore this.
+M=D
+@R13
 AM=M-1
 D=M
-@THIS	// restore this.
+@ARG    // restore arg.
 M=D
-@FRAME
+@R13
 AM=M-1
 D=M
-@ARG	// restore arg.
+@LCL    // restore local.
 M=D
-@FRAME
-AM=M-1
-D=M
-@LCL 	// restore local.
-M=D
-@FRAME
-AM=M-1
-D=M
-A=D 	// jumps to return address.
-0;JMP
+        // ~~~~~~~ retrieve and jump to the return address ~~~~~~~~~~~~~
+@R14
+A=M
+0; JMP  // jump to the return address.
 
 (FUNCTION.class1.get)
 
@@ -159,51 +170,57 @@ M=D
 @SP // pop d
 AM=M-1
 D=M
-M=0
 A=A-1
 M=M-D
 
-// return
+// ==================== Return ============================
+        // ~~~~~~~  create frame pointer ~~~~~~~~~    FRAME = LCL
+@LCL    
+D=M
+@R13    // <- using register 13 for frame pointer.
+M=D 
+        // ~~~~~~~  save return address ~~~~~~~~~~~~  RET = *(FRAME - 5)
+@5 
+A=D-A
+D=M 
+@R14    // <- using register 14 for return address.
+M=D
+        // ~~~~~~~ reposition return value ~~~~~~~~~  *ARG = pop()
 @SP // pop d
 AM=M-1
 D=M
-M=0
-@ARG 	// places return value in the right spot.
+@ARG
 A=M
 M=D
-@ARG	// restores stack pointer.  SP <- ARG + 1
+        // ~~~~~~~~~~~~ restore values ~~~~~~~~~~~~~
+@ARG    // restores stack pointer.
 D=M
-@SP
+@SP     // SP = ARG + 1
 M=D+1
-@LCL 	// init frame pointer
-D=M
-@FRAME
-M=D
-@FRAME
+@R13
 AM=M-1
 D=M
-@THAT 	// restore that.
+@THAT   // restore that
 M=D
-@FRAME
+@R13
+AM=M-1
+D=M 
+@THIS   // restore this.
+M=D
+@R13
 AM=M-1
 D=M
-@THIS	// restore this.
+@ARG    // restore arg.
 M=D
-@FRAME
+@R13
 AM=M-1
 D=M
-@ARG	// restore arg.
+@LCL    // restore local.
 M=D
-@FRAME
-AM=M-1
-D=M
-@LCL 	// restore local.
-M=D
-@FRAME
-AM=M-1
-D=M
-A=D 	// jumps to return address.
-0;JMP
+        // ~~~~~~~ retrieve and jump to the return address ~~~~~~~~~~~~~
+@R14
+A=M
+0; JMP  // jump to the return address.
 
 // ~~~~ Class2.vm ~~~~
 (FUNCTION.class2.set)
@@ -223,7 +240,6 @@ M=D
 @SP // pop d
 AM=M-1
 D=M
-M=0
 @Class2.vm.0
 M=D
 
@@ -242,7 +258,6 @@ M=D
 @SP // pop d
 AM=M-1
 D=M
-M=0
 @Class2.vm.1
 M=D
 
@@ -254,47 +269,54 @@ M=M+1
 A=M-1
 M=D
 
-// return
+// ==================== Return ============================
+        // ~~~~~~~  create frame pointer ~~~~~~~~~    FRAME = LCL
+@LCL    
+D=M
+@R13    // <- using register 13 for frame pointer.
+M=D 
+        // ~~~~~~~  save return address ~~~~~~~~~~~~  RET = *(FRAME - 5)
+@5 
+A=D-A
+D=M 
+@R14    // <- using register 14 for return address.
+M=D
+        // ~~~~~~~ reposition return value ~~~~~~~~~  *ARG = pop()
 @SP // pop d
 AM=M-1
 D=M
-M=0
-@ARG 	// places return value in the right spot.
+@ARG
 A=M
 M=D
-@ARG	// restores stack pointer.  SP <- ARG + 1
+        // ~~~~~~~~~~~~ restore values ~~~~~~~~~~~~~
+@ARG    // restores stack pointer.
 D=M
-@SP
+@SP     // SP = ARG + 1
 M=D+1
-@LCL 	// init frame pointer
-D=M
-@FRAME
-M=D
-@FRAME
+@R13
 AM=M-1
 D=M
-@THAT 	// restore that.
+@THAT   // restore that
 M=D
-@FRAME
+@R13
+AM=M-1
+D=M 
+@THIS   // restore this.
+M=D
+@R13
 AM=M-1
 D=M
-@THIS	// restore this.
+@ARG    // restore arg.
 M=D
-@FRAME
+@R13
 AM=M-1
 D=M
-@ARG	// restore arg.
+@LCL    // restore local.
 M=D
-@FRAME
-AM=M-1
-D=M
-@LCL 	// restore local.
-M=D
-@FRAME
-AM=M-1
-D=M
-A=D 	// jumps to return address.
-0;JMP
+        // ~~~~~~~ retrieve and jump to the return address ~~~~~~~~~~~~~
+@R14
+A=M
+0; JMP  // jump to the return address.
 
 (FUNCTION.class2.get)
 
@@ -318,51 +340,57 @@ M=D
 @SP // pop d
 AM=M-1
 D=M
-M=0
 A=A-1
 M=M-D
 
-// return
+// ==================== Return ============================
+        // ~~~~~~~  create frame pointer ~~~~~~~~~    FRAME = LCL
+@LCL    
+D=M
+@R13    // <- using register 13 for frame pointer.
+M=D 
+        // ~~~~~~~  save return address ~~~~~~~~~~~~  RET = *(FRAME - 5)
+@5 
+A=D-A
+D=M 
+@R14    // <- using register 14 for return address.
+M=D
+        // ~~~~~~~ reposition return value ~~~~~~~~~  *ARG = pop()
 @SP // pop d
 AM=M-1
 D=M
-M=0
-@ARG 	// places return value in the right spot.
+@ARG
 A=M
 M=D
-@ARG	// restores stack pointer.  SP <- ARG + 1
+        // ~~~~~~~~~~~~ restore values ~~~~~~~~~~~~~
+@ARG    // restores stack pointer.
 D=M
-@SP
+@SP     // SP = ARG + 1
 M=D+1
-@LCL 	// init frame pointer
-D=M
-@FRAME
-M=D
-@FRAME
+@R13
 AM=M-1
 D=M
-@THAT 	// restore that.
+@THAT   // restore that
 M=D
-@FRAME
+@R13
+AM=M-1
+D=M 
+@THIS   // restore this.
+M=D
+@R13
 AM=M-1
 D=M
-@THIS	// restore this.
+@ARG    // restore arg.
 M=D
-@FRAME
+@R13
 AM=M-1
 D=M
-@ARG	// restore arg.
+@LCL    // restore local.
 M=D
-@FRAME
-AM=M-1
-D=M
-@LCL 	// restore local.
-M=D
-@FRAME
-AM=M-1
-D=M
-A=D 	// jumps to return address.
-0;JMP
+        // ~~~~~~~ retrieve and jump to the return address ~~~~~~~~~~~~~
+@R14
+A=M
+0; JMP  // jump to the return address.
 
 // ~~~~ Sys.vm ~~~~
 (FUNCTION.sys.init)
@@ -383,42 +411,48 @@ M=M+1
 A=M-1
 M=D
 
- // call class1.set 2 
-@RETURN.class1.set.2
+// ===============  call class1.set 2 ====================
+@RETURN.class1.set.2  // push return address.
 D=A
 @SP // push d
 M=M+1
 A=M-1
 M=D
-@LCL
+@LCL   // push local
 D=M
 @SP // push d
 M=M+1
 A=M-1
 M=D
-@ARG
+@ARG   // push arg
 D=M
 @SP // push d
 M=M+1
 A=M-1
 M=D
-@THIS
+@THIS  // push this
 D=M
 @SP // push d
 M=M+1
 A=M-1
 M=D
-@2
+@THAT  // push that
+D=M
+@SP // push d
+M=M+1
+A=M-1
+M=D
+@7    // set D <- (SP - nArgs - 5)
 D=A
 @SP
-D=D-A
-@ARG
+D=M-D
+@ARG   // set ARG <- D
 M=D
-@SP
+@SP    // set LCL <- SP
 D=M
 @LCL
 M=D
-@FUNCTION.class1.set
+@FUNCTION.class1.set  // goto f
 0; JMP
 (RETURN.class1.set.2)
 
@@ -432,7 +466,6 @@ M=D
 @SP // pop d
 AM=M-1
 D=M
-M=0
 @R13
 A=M
 M=D
@@ -453,42 +486,48 @@ M=M+1
 A=M-1
 M=D
 
- // call class2.set 2 
-@RETURN.class2.set.3
+// ===============  call class2.set 2 ====================
+@RETURN.class2.set.3  // push return address.
 D=A
 @SP // push d
 M=M+1
 A=M-1
 M=D
-@LCL
+@LCL   // push local
 D=M
 @SP // push d
 M=M+1
 A=M-1
 M=D
-@ARG
+@ARG   // push arg
 D=M
 @SP // push d
 M=M+1
 A=M-1
 M=D
-@THIS
+@THIS  // push this
 D=M
 @SP // push d
 M=M+1
 A=M-1
 M=D
-@2
+@THAT  // push that
+D=M
+@SP // push d
+M=M+1
+A=M-1
+M=D
+@7    // set D <- (SP - nArgs - 5)
 D=A
 @SP
-D=D-A
-@ARG
+D=M-D
+@ARG   // set ARG <- D
 M=D
-@SP
+@SP    // set LCL <- SP
 D=M
 @LCL
 M=D
-@FUNCTION.class2.set
+@FUNCTION.class2.set  // goto f
 0; JMP
 (RETURN.class2.set.3)
 
@@ -502,86 +541,97 @@ M=D
 @SP // pop d
 AM=M-1
 D=M
-M=0
 @R13
 A=M
 M=D
 
- // call class1.get 0 
-@RETURN.class1.get.4
+// ===============  call class1.get 0 ====================
+@RETURN.class1.get.4  // push return address.
 D=A
 @SP // push d
 M=M+1
 A=M-1
 M=D
-@LCL
+@LCL   // push local
 D=M
 @SP // push d
 M=M+1
 A=M-1
 M=D
-@ARG
+@ARG   // push arg
 D=M
 @SP // push d
 M=M+1
 A=M-1
 M=D
-@THIS
+@THIS  // push this
 D=M
 @SP // push d
 M=M+1
 A=M-1
 M=D
-@0
+@THAT  // push that
+D=M
+@SP // push d
+M=M+1
+A=M-1
+M=D
+@5    // set D <- (SP - nArgs - 5)
 D=A
 @SP
-D=D-A
-@ARG
+D=M-D
+@ARG   // set ARG <- D
 M=D
-@SP
+@SP    // set LCL <- SP
 D=M
 @LCL
 M=D
-@FUNCTION.class1.get
+@FUNCTION.class1.get  // goto f
 0; JMP
 (RETURN.class1.get.4)
 
- // call class2.get 0 
-@RETURN.class2.get.5
+// ===============  call class2.get 0 ====================
+@RETURN.class2.get.5  // push return address.
 D=A
 @SP // push d
 M=M+1
 A=M-1
 M=D
-@LCL
+@LCL   // push local
 D=M
 @SP // push d
 M=M+1
 A=M-1
 M=D
-@ARG
+@ARG   // push arg
 D=M
 @SP // push d
 M=M+1
 A=M-1
 M=D
-@THIS
+@THIS  // push this
 D=M
 @SP // push d
 M=M+1
 A=M-1
 M=D
-@0
+@THAT  // push that
+D=M
+@SP // push d
+M=M+1
+A=M-1
+M=D
+@5    // set D <- (SP - nArgs - 5)
 D=A
 @SP
-D=D-A
-@ARG
+D=M-D
+@ARG   // set ARG <- D
 M=D
-@SP
+@SP    // set LCL <- SP
 D=M
 @LCL
 M=D
-@FUNCTION.class2.get
+@FUNCTION.class2.get  // goto f
 0; JMP
 (RETURN.class2.get.5)
 
